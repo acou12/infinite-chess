@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <title>Infinite Chess - Board Editor</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.2.0/lib/p5.min.js"></script>
+    <script src="editor.js"></script>
+    <script>
+    // Enable navigation prompt
+    window.onbeforeunload = function() {
+        return true;
+    };
+    </script>
+    <style>
+    html, body, div, canvas {
+        margin: 0;
+        padding: 0;
+        position: fixed;
+    }
+    :root {
+      touch-action: none;
+      height: 100%
+    }
+    a {
+      color: #37bfad;
+    }
+    a:visited {
+      color: #37bfad;
+    }
+    p {
+      font-size: 1vw
+    }
+    </style>
+  </head>
+  <body oncontextmenu="return false;">
+    <main>
+      <div id="credits" style="z-index: 100; display: none; font-family: Verdana, sans-serif; color: white;">
+        <h3>Credits</h3>
+        <p>Rose, hawk, and witch icons made by <a href="https://musketeerchess.net/" target="_blank">Musketeer Chess</a>.
+        </br>
+        </br>
+        Huygens icon made by <a href="https://www.chess.com/member/vickalan" target="_blank">vickalan</a>
+        </br>
+        </br>
+        The classic chess pieces were made by <a href="https://en.wikipedia.org/wiki/User:Cburnett" target="_blank">Cburnett</a>, the hybrid pieces (chancellor, princess, and amazon) were made by <a href="https://en.wikipedia.org/wiki/User:NikNaks" target="_blank">NikNaks</a>, and the guards were made by <a href="https://en.wikipedia.org/wiki/User:CheChe" target="_blank">CheChe</a>.
+        </br>
+        </br>
+        I made the black amazon myself based off of NikNaks' white version.
+      </p>
+      </div>
+    </main>
+  </body>
+</html>
