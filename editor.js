@@ -247,18 +247,12 @@ function preload() {
   bro = createTemplate(21, "R", "bro", rose, BLACK)
   ww = createTemplateSpecial(22, "W", "ww", witch, () => false, () => {}, WHITE)
   bw = createTemplateSpecial(23, "W", "bw", witch, () => false, () => {}, BLACK)
-  // wpg = createTemplate(24, "Pg", "wpg", pegasus, WHITE)
-  // bpg = createTemplate(25, "Pg", "bpg", pegasus, BLACK)
   wa = createTemplate(26, "A", "wa", amazon, WHITE)
   ba = createTemplate(27, "A", "ba", amazon, BLACK)
-  // wpo = createTemplate(26, "Pt", "portal", amazon, WHITE)
-  // bpo = createTemplate(27, "Pt", "portal_black", amazon, BLACK)
   whu = createTemplate(28, "H", "whu", huygen, WHITE)
   bhu = createTemplate(29, "H", "bhu", huygen, BLACK)
   // todo: add warning message for unsupported actions (eg taking a screenshot on a mobile device)
 }
-
-// sunset: colorify(224, 0, 255, 255, 170, 0)
 
 var primes = [2, 3, 5]
 
@@ -289,11 +283,7 @@ function generatePrimes() {
 }
 
 function setup() {
-  //loadCode(fide)
-  //colorify(224, 0, 255, 255, 170, 0)
-  // textFont(loadFont("Roboto-Light.ttf"))
   createCanvas(windowWidth, windowHeight);
-//  pixelDensity(1.0)
   realBoardOffset = createVector(0, 0)
   shownBoardOffset = createVector(0, 0)
   dragBegin = createVector(0, 0)
@@ -310,10 +300,6 @@ function setup_pieces() {
   superPawn = createPiece(-2, 1, wp)
   pieces.push(superPawn)
   pieces.push(createPiece(-1, 1, wr))
-  // pieces.push(createPiece(3, -1, wpg))
-  // pieces.push(createPiece(6, -1, wpg))
-  // pieces.push(createPiece(3, 10, bpg))
-  // pieces.push(createPiece(6, 10, bpg))
   pieces.push(createPiece(0, 1, wc))
   pieces.push(createPiece(1, 1, wg))
   pieces.push(createPiece(2, 1, wn))
@@ -394,8 +380,6 @@ function setup_pieces() {
   realBoardOffset.y = totalY / pieces.length + height / 2
   shownBoardOffset.x = -totalX / pieces.length + width / 2
   shownBoardOffset.y = totalY / pieces.length + height / 2
-  //realBoardOffset.x = 100
-  //realBoardOffset.y = 100
   boards.push(pieces)
   moves.push(createMove(createVector(1, 1), createVector(1, 1)))
 }
@@ -460,9 +444,6 @@ function draw() {
     resizeCanvas(window.innerWidth, window.innerHeight, false)
   }
   background(240, 217, 181)
-  // if (mobileZooming) {
-  //   realScale = scaleInit * dist(touch1.x, touch1.y, touch2.x, touch2.y) / distInit
-  // }
   shownScale += (realScale - shownScale) * 0.3
   shownBoardOffset.x += (realBoardOffset.x - shownBoardOffset.x) * 0.3
   shownBoardOffset.y += (realBoardOffset.y - shownBoardOffset.y) * 0.3
@@ -470,7 +451,6 @@ function draw() {
     realBoardOffset.x = winMouseX - dragBegin.x;
     realBoardOffset.y = winMouseY - dragBegin.y;
   }
-  // rotate(Math.PI / 4)
   for (var x = Math.floor(-shownBoardOffset.x / (tileSize * shownScale)); x < (width - shownBoardOffset.x) / (tileSize * shownScale) + 1; x++) {
     for (var y = Math.floor(-shownBoardOffset.y / (tileSize * shownScale)); y < (height - shownBoardOffset.y) / (tileSize * shownScale) + 1; y++) {
       if ((x + y) % 2 == 0) {
@@ -478,18 +458,14 @@ function draw() {
         noStroke();
         rect(x * (tileSize * shownScale) + shownBoardOffset.x, y * (tileSize * shownScale) + shownBoardOffset.y, (tileSize * shownScale), (tileSize * shownScale));
       }
-      // else fill(240, 217, 181);
       if (!takingImage) {
         if (currentBoard > 0 && haveMoved && x === lastMoveLast.x && -y === lastMoveLast.y) {
           fill(0, 255, 26, 127);
-          // fill(128, 255, 141, 127);
           noStroke();
           rect(x * (tileSize * shownScale) + shownBoardOffset.x, y * (tileSize * shownScale) + shownBoardOffset.y, (tileSize * shownScale), (tileSize * shownScale));
         }
         if (currentBoard > 0 && haveMoved && x === lastMoveFirst.x && -y === lastMoveFirst.y) {
-          // fill(3, 236, 252);
           fill(0, 255, 26, 127);
-          // fill(128, 255, 141, 127);
           noStroke();
           rect(x * (tileSize * shownScale) + shownBoardOffset.x, y * (tileSize * shownScale) + shownBoardOffset.y, (tileSize * shownScale), (tileSize * shownScale));
         }
@@ -520,7 +496,6 @@ function draw() {
   }
   for (var i = 0; i < pieces.length; i++) {
     if (draggingPiece && pieces[i] == draggedPiece) {
-//      image(pieces[i].i, pieces[i].x * (tileSize * shownScale) + shownBoardOffset.x, -pieces[i].y * (tileSize * shownScale) + shownBoardOffset.y, (tileSize * shownScale), (tileSize * shownScale), 120);
     } else {
       image(pieces[i].p.image, pieces[i].x * (tileSize * shownScale) + shownBoardOffset.x, -pieces[i].y * (tileSize * shownScale) + shownBoardOffset.y, (tileSize * shownScale), (tileSize * shownScale));
     }
@@ -545,7 +520,6 @@ function draw() {
     strokeWeight(11 * shownScale)
     var theLine = lines[i]
     if (!theLine.c) {
-      // stroke(19, 207, 56, 200)
       stroke(0, 102, 255)
     } else {
       stroke(230, 76, 76)
@@ -567,7 +541,6 @@ function draw() {
   }
   if (creatingLine) {
     if (!shiftPressed) {
-      // stroke(19, 207, 56, 200)
       stroke(0, 102, 255, 200)
     } else {
       stroke(230, 76, 76, 200)
@@ -595,7 +568,6 @@ function draw() {
   rect(0, height - numberBarSize * 2, width, numberBarSize * 2)
   fill(255)
   textSize(24)
-  //textSize(min(28, 16 * shownScale * 3))
   textAlign(CENTER, CENTER)
   for (var x = Math.floor(-(shownBoardOffset.x) / (tileSize * shownScale)); x < ((width) - (shownBoardOffset.x)) / (tileSize * shownScale) + 1; x++) {
     if (x * (tileSize * shownScale) + shownBoardOffset.x > numberBarSize && x * (tileSize * shownScale) + shownBoardOffset.x + (tileSize * shownScale) < width) if (x % 5 === 0) text(x, x * (tileSize * shownScale) + shownBoardOffset.x + (tileSize * shownScale) / 2, height - numberBarSize)
@@ -634,14 +606,6 @@ function draw() {
     }
   }
   if (!takingImage) drawButtons()
-  // if (takingImage) {
-  //   takingImage = false
-  //   try {
-  //     save('infinite' + new Date().toISOString().substring(0, 19).replace('T', '_').replaceAll(':', '.') + '.png')
-  //   } catch (error) {
-  //     console.log("error: this device does not support save().")
-  //   }
-  // }
   if (boardEditor) {
     drawBox()
   }
@@ -702,7 +666,6 @@ function outline(num) {
     var template = templates[t]
     if (template.color != BLACK) continue
     var img = template.image
-    // img.resize(500, 500)
     img.loadPixels()
     for (var n = 0; n < num; n++) {
       var chosen = []
@@ -987,10 +950,6 @@ function mousePressed() {
         corner = 3
         return
       }
-      // rect(margin / 2, margin / 2, size, size)
-      // image(download, margin / 2 + size * 0.1, margin / 2 + size * 0.1, size * 0.8, size * 0.8)
-      // rect(margin / 2, margin / 2 + (size + margin), size, size)
-      // image(cancel, margin / 2 + size * 0.1, margin / 2 + (size + margin) + size * 0.1, size * 0.8, size * 0.8)
       if (margin / 2 <= winMouseX && winMouseX <= margin / 2 + size) {
         if (margin / 2 <= winMouseY && winMouseY <= margin / 2 + size) {
           save(createAnImage(0.8), 'infinite' + new Date().toISOString().substring(0, 19).replace('T', '_').replaceAll(':', '.') + '.png')
@@ -1094,10 +1053,6 @@ var boards = []
 var whiteInCheck = false
 var blackInCheck = false
 
-// function colorifyOne(r, g, b) {
-//   colorify(r, g, b, r, g, b)
-// }
-
 var g
 
 function createAnImage(factor) {
@@ -1185,21 +1140,16 @@ function createAnImage(factor) {
   for (var y = Math.floor(-(oy) / s); y < (((captureY2 - captureY1) * factor) - (oy)) / s + 1; y++) {
     if (y * s + oy > 0 && y * s + oy + s < g.height - numberBarSize) g.text(-y, s / 2, y * s + oy + s / 2)
   }
-  // window.open(g.canvas.toDataURL())
   return g
 }
+
+// currently unused.
 
 function colorify(colors) {
   outline(10)
   for (var j = 0; j < templates.length; j++) {
     var img = templates[j].image
     img.loadPixels()
-    // r1 = Math.floor(Math.random() * 256)
-    // g1 = Math.floor(Math.random() * 256)
-    // b1 = Math.floor(Math.random() * 256)
-    // r2 = Math.floor(Math.random() * 256)
-    // g2 = Math.floor(Math.random() * 256)
-    // b2 = Math.floor(Math.random() * 256)
     var start
     var end
     for (var i = 0; i < img.pixels.length; i++) {
@@ -1236,16 +1186,12 @@ function colorify(colors) {
   }
 }
 
+// currently unused.
+
 function colorifyOld(r1, g1, b1, r2, g2, b2) {
   for (var j = 0; j < templates.length; j++) {
     var img = templates[j].image
     img.loadPixels()
-    // r1 = Math.floor(Math.random() * 256)
-    // g1 = Math.floor(Math.random() * 256)
-    // b1 = Math.floor(Math.random() * 256)
-    // r2 = Math.floor(Math.random() * 256)
-    // g2 = Math.floor(Math.random() * 256)
-    // b2 = Math.floor(Math.random() * 256)
     for (var i = 0; i < img.pixels.length; i++) {
       if (i % 4 === 0) {
         // var percent = i / (img.pixels.length)
@@ -1328,8 +1274,6 @@ function mouseReleased() {
       } else {
         haveMoved = false
       }
-      // if (turn !== draggedPiece.p.color) return
-      // turn *= -1
       if (thePieceAt != undefined) {
         var index = pieces.indexOf(thePieceAt)
         if (index > -1) pieces.splice(index, 1)
@@ -1342,15 +1286,6 @@ function mouseReleased() {
       draggedPiece.y = realYToBoard(winMouseY)
       lines = []
       checkIfInCheck()
-      // if (ply % 2 === 0) {
-      //   string = string + (ply === 0 ? "" : "\n") + (ply / 2 + 1) + ". "
-      // } else string = string + ", "
-      // if (draggedPiece.p === bp || draggedPiece.p === wp) {
-      //   string = string + (canTake ? lastMoveFirst.x + "x" : "") + "(" + realXToBoard(winMouseX) + ", " + realYToBoard(winMouseY) + ")"
-      // } else {
-      //   string = string + draggedPiece.p.name + (canTake ? "x" : "") + "(" + realXToBoard(winMouseX) + ", " + realYToBoard(winMouseY) + ")"
-      // }
-      // ply += 1
       if ((whiteInCheck && draggedPiece.p.color === WHITE || blackInCheck && draggedPiece.p.color === BLACK) && !boardEditor) {
         pieces = oldBoard
         lastMoveFirst = oldMoveFirst
@@ -1399,15 +1334,6 @@ function mouseWheel(event) {
       realBoardOffset.x -= (winMouseX - realBoardOffset.x) * n;
       realBoardOffset.y -= (winMouseY - realBoardOffset.y) * n;
     }
-  // } else {
-  //   realScale *= 0.85;
-  //   if (realScale < 0.1) {
-  //     realScale /= 0.85;
-  //   } else {
-  //     realBoardOffset.x += (winMouseX - realBoardOffset.x) * 0.15;
-  //     realBoardOffset.y += (winMouseY - realBoardOffset.y) * 0.15;
-  //   }
-  // }
   return false
 }
 
@@ -1470,8 +1396,3 @@ var touch1
 var touch2
 var distInit
 var scaleInit
-
-// function touchStarted() {
-//   rect(0, 0, 100, 100)
-//   return false
-// }
