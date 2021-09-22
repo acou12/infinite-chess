@@ -1,0 +1,24 @@
+{
+  "name": "infinite-chess",
+  "version": "2.0.0-alpha",
+  "scripts": {
+    "dev": "vite",
+    "school": "vite --host --https --port 25565",
+    "build": "tsc && vite build",
+    "serve": "vite preview",
+    "prettier": "prettier src/**/* -w" 
+  },
+  "devDependencies": {
+    "@types/victor": "^1.1.0",
+    "typescript": "^4.3.2",
+    "victor": "^1.1.0",
+    "vite": "^2.5.4"
+  },
+  "dependencies": {
+    "prettier": "^2.4.1",
+    "prettier-plugin-svelte": "^2.4.0"
+  },
+  "prettier": {
+    "semi": false
+  }
+}
