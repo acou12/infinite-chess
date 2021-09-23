@@ -8,6 +8,7 @@ import {
   knight,
   pawn,
   rook,
+  Bounds,
 } from "./pieces"
 
 const canvas = document.querySelector("canvas")!
@@ -62,6 +63,10 @@ let pieces: Piece[] = [
   { color: "BLACK", location: new Vector(7, 6), type: pawn },
 ]
 
+let board = {
+  pieces: pieces
+}
+
 let offsetX = 0
 let offsetY = 0
 let scale = 1
@@ -104,6 +109,13 @@ function pieceAtTile(tile: Vector): Piece | undefined {
 
 const tileSize = 100
 
+let bounds: Bounds = {
+  minX: 0,
+  maxX: 100,
+  minY: 0,
+  maxY: 100
+}
+
 function draw() {
   requestAnimationFrame(draw)
   canvas.width = canvas.clientWidth
@@ -112,14 +124,15 @@ function draw() {
   ctx.fillStyle = "#34007a"
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-  let minX = Math.floor((0 - offsetX) / tileSize / scale)
-  let minY = Math.floor((0 - offsetY) / tileSize / scale)
+  bounds = {
+    minX: Math.floor((0 - offsetX) / tileSize / scale),
+    minY: Math.floor((0 - offsetY) / tileSize / scale),
+    maxX: (canvas.width - offsetX) / tileSize / scale,
+    maxY: (canvas.height - offsetY) / tileSize / scale,
+  }
 
-  let maxX = (canvas.width - offsetX) / tileSize / scale
-  let maxY = (canvas.height - offsetY) / tileSize / scale
-
-  for (let x = minX; x < maxX; x++) {
-    for (let y = minY; y < maxY; y++) {
+  for (let x = bounds.minX; x < bounds.maxX; x++) {
+    for (let y = bounds.minY; y < bounds.maxY; y++) {
       if ((x + y) % 2 == 0) {
         ctx.fillStyle = "#7448b0"
         ctx.fillRect(
@@ -129,14 +142,14 @@ function draw() {
           matchScale(tileSize)
         )
       }
-      if (pickedUp && legalMove(pickedUp, new Vector(x, y))) {
-        ctx.fillStyle = "black"
+      if (pickedUp && pickedUpLegalMove(new Vector(x, y))) {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)"
         ctx.beginPath()
         ctx.ellipse(
           transformX(x * tileSize + tileSize / 2),
           transformY(y * tileSize + tileSize / 2),
-          20,
-          20,
+          matchScale(20),
+          matchScale(20),
           0,
           0,
           Math.PI * 2
@@ -201,26 +214,45 @@ document.addEventListener("mousemove", (e) => {
 })
 
 let pickedUp: Piece | undefined = undefined
+let pickedUpMoves: Vector[] = []
+let pickedUpTakes: Vector[] = []
 
 document.addEventListener("mousedown", () => {
   let piece = pieceAt(mousePos.x, mousePos.y)
   if (piece) {
     pickedUp = piece
+    pickedUpMoves = pickedUp.type.moves(pickedUp, board, bounds)
+    pickedUpTakes = pickedUp.type.takes(pickedUp, board, bounds)
   } else {
     movingBoard = true
   }
+
 })
+
+function matchingVector(list: Array<Vector>, v: Vector) {
+  return list.find(it => it.x === v.x && it.y === v.y)
+}
+
+function pickedUpLegalMove(tile: Vector) {
+  if (!pickedUp) return false
+  let otherPiece = pieceAtTile(tile)
+  return otherPiece ? (matchingVector(pickedUpTakes, tile) && !(pickedUp === otherPiece) &&
+  !(pickedUp.color === otherPiece.color)) : matchingVector(pickedUpMoves, tile)
+}
 
 /**
  * @returns Whether it is legal for `piece` to move to `tile`.
+ * 
+ * 
  */
 function legalMove(piece: Piece, tile: Vector) {
+  // return false
   let otherPiece = pieceAtTile(tile)
   return otherPiece
-    ? piece.type.takes(piece, tile) &&
+    ? piece.type.takes(piece, board, bounds).find(other => other.x === tile.x && other.y === tile.y) &&
         !(piece === otherPiece) &&
         !(piece.color === otherPiece.color)
-    : piece.type.moves(piece, tile)
+    : piece.type.moves(piece, board, bounds).find(other => other.x === tile.x && other.y === tile.y)
 }
 
 /**
@@ -239,7 +271,7 @@ document.addEventListener("mouseup", () => {
   movingBoard = false
   if (pickedUp) {
     let tile = tileAt(mousePos.x, mousePos.y)
-    if (legalMove(pickedUp, tile)) movePiece(pickedUp, tile)
+    if (pickedUpLegalMove(tile)) movePiece(pickedUp, tile)
     pickedUp = undefined
   }
 })

@@ -9,13 +9,23 @@ export class Vector {
   plus(other: Vector): Vector {
     return new Vector(this.x + other.x, this.y + other.y)
   }
+  copy(): Vector {
+    return new Vector(this.x, this.y)
+  }
+}
+
+export interface Bounds {
+  minX: number
+  maxX: number
+  minY: number
+  maxY: number
+}
+
+export interface Board {
+  pieces: Piece[]
 }
 
 export type Color = "WHITE" | "BLACK"
-
-/* TODO: Generate valid moves dynamically, regenerate
-   them on zoom or pan using debounce. For now, `moves`
-   simply determines if a given move is legal. */
 
 export abstract class PieceType {
   abstract whiteImage: HTMLImageElement
@@ -25,13 +35,12 @@ export abstract class PieceType {
    * move to a certain tile.
    *
    * @param piece The piece being moved.
-   * @param to The tile that it may or may not move to.
-   * @returns Whether `piece` may move to the tile `to`.
+   * @returns A list of legal moves for the piece
    */
-  abstract moves(piece: Piece, to: Vector): boolean
-  takes(piece: Piece, to: Vector): boolean {
-    return this.moves(piece, to)
-  }
+   abstract moves(piece: Piece, board: Board, bounds: Bounds): Vector[]
+   takes(piece: Piece, board: Board, bounds: Bounds): Vector[] {
+     return this.moves(piece, board, bounds)
+   }
 }
 
 export interface Piece {
@@ -54,60 +63,41 @@ function createImage(src: string) {
 export let king = new (class extends PieceType {
   whiteImage = createImage("wk")
   blackImage = createImage("bk")
-  override moves(piece: Piece, to: Vector): boolean {
-    let diff = piece.location.absMinus(to)
-    return (
-      Math.abs(diff.x) <= 1 && Math.abs(diff.y) <= 1 && Math.abs(diff.y) <= 1
-    )
-  }
+  override moves = step(new Vector(1, 1), 1, false)
 })()
 
 export let bishop = new (class extends PieceType {
   whiteImage = createImage("wb")
   blackImage = createImage("bb")
-  override moves(piece: Piece, to: Vector): boolean {
-    let diff = piece.location.absMinus(to)
-    return diff.x === diff.y
-  }
+  override moves = step(new Vector(1, 1))
 })()
 
 export let rook = new (class extends PieceType {
   whiteImage = createImage("wr")
   blackImage = createImage("br")
-  override moves(piece: Piece, to: Vector): boolean {
-    let diff = piece.location.minus(to)
-    return diff.x === 0 || diff.y === 0
-  }
+  override moves = step(new Vector(0, 1), Infinity, true)
 })()
 
 export let pawn = new (class extends PieceType {
   whiteImage = createImage("wp")
   blackImage = createImage("bp")
-  override moves(piece: Piece, to: Vector): boolean {
-    let diff = piece.location.minus(to)
-    return (
-      diff.x === 0 &&
-      (piece.color === "WHITE"
-        ? diff.y === -1 || diff.y === -2
-        : diff.y === 1 || diff.y === 2)
-    )
-  }
+  override moves = (piece: Piece) => 
+    piece.color === 'WHITE' 
+      ? [piece.location.plus(new Vector(0,  1)), piece.location.plus(new Vector(0,  2))]
+      : [piece.location.plus(new Vector(0, -1)), piece.location.plus(new Vector(0, -2))]
 })()
 
 export let knight = new (class extends PieceType {
   whiteImage = createImage("wn")
   blackImage = createImage("bn")
-  override moves(piece: Piece, to: Vector): boolean {
-    let diff = piece.location.absMinus(to)
-    return (diff.x === 2 && diff.y === 1) || (diff.x === 1 && diff.y === 2)
-  }
+  override moves = step(new Vector(2, 1), 1, true)
 })()
 
-type Moves = (piece: Piece, to: Vector) => boolean
+type Moves = (piece: Piece, board: Board, bounds: Bounds) => Vector[]
 
 function combine(m1: Moves, m2: Moves): Moves {
-  return (piece: Piece, to: Vector) => {
-    return m1(piece, to) || m2(piece, to)
+  return (piece: Piece, board: Board, bounds: Bounds) => {
+    return [...m1(piece, board, bounds), ...m2(piece, board, bounds)]
   }
 }
 
@@ -117,15 +107,47 @@ export let queen = new (class extends PieceType {
   override moves = combine(rook.moves, bishop.moves)
 })()
 
-/** 
+function inBounds(bounds: Bounds, v: Vector) {
+  return bounds.minX <= v.x && v.x <= bounds.maxX &&
+         bounds.minY <= v.y && v.y <= bounds.maxY
+}
+
+/**
+ * Create
+ * 
  * @param d The absolute change in position per "step".
- * @param n The maximum number of steps; by default, there
- *          is no maximum.
- * @param symmetric Should does the order of d.x and d.y
- *                  matter? This is relevant for pieces
- *                  like the knight, where we want an L shape
- *                  in any direction.
+ * @param maxN The maximum number of steps; by default, there
+ *          is no maximum. 
  */
-function step(d: Vector, n: number = Infinity, symmetric: boolean = false): Moves {
-  throw new Error('Not implemented.')
+
+function step(d: Vector, maxN: number = Infinity, symmetric: boolean = false): Moves {
+  return (piece: Piece, _board: Board, bounds: Bounds) => {
+    let moves: Vector[] = []
+    function stepInOneDirection(sx: number, sy: number) {
+      let n = 0;
+      let newLocation = piece.location.plus(new Vector(d.x * sx, d.y * sy))
+      // console.log(bounds, newLocation)
+      while (n < maxN && inBounds(bounds, newLocation)) {
+        moves.push(newLocation)
+        newLocation = newLocation.plus(new Vector(d.x * sx, d.y * sy))
+        n++
+      }
+    }
+    stepInOneDirection(1, 1)
+    stepInOneDirection(-1, 1)
+    stepInOneDirection(1, -1)
+    stepInOneDirection(-1, -1)
+    if (symmetric) {
+      // swap them and do it again.
+      let tmp = d.x
+      d.x = d.y
+      d.y = tmp
+      stepInOneDirection(1, 1)
+      stepInOneDirection(-1, 1)
+      stepInOneDirection(1, -1)
+      stepInOneDirection(-1, -1)
+    }
+    // moves = moves.filter(doesNotCauseCheck) // ...eventually.
+    return moves
+  }
 }
