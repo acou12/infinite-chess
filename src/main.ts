@@ -25,46 +25,45 @@ img.src = "/images/wk.png"
  * that for both the AI logic and the actual UI logic.
  */
 
-let pieces: Piece[] = [
-  { color: "WHITE", location: new Vector(0, 0), type: rook },
-  { color: "WHITE", location: new Vector(1, 0), type: knight },
-  { color: "WHITE", location: new Vector(2, 0), type: bishop },
-  { color: "WHITE", location: new Vector(3, 0), type: king },
-  { color: "WHITE", location: new Vector(4, 0), type: queen },
-  { color: "WHITE", location: new Vector(5, 0), type: bishop },
-  { color: "WHITE", location: new Vector(6, 0), type: knight },
-  { color: "WHITE", location: new Vector(7, 0), type: rook },
-
-  { color: "WHITE", location: new Vector(0, 1), type: pawn },
-  { color: "WHITE", location: new Vector(1, 1), type: pawn },
-  { color: "WHITE", location: new Vector(2, 1), type: pawn },
-  { color: "WHITE", location: new Vector(3, 1), type: pawn },
-  { color: "WHITE", location: new Vector(4, 1), type: pawn },
-  { color: "WHITE", location: new Vector(5, 1), type: pawn },
-  { color: "WHITE", location: new Vector(6, 1), type: pawn },
-  { color: "WHITE", location: new Vector(7, 1), type: pawn },
-
-  { color: "BLACK", location: new Vector(0, 7), type: rook },
-  { color: "BLACK", location: new Vector(1, 7), type: knight },
-  { color: "BLACK", location: new Vector(2, 7), type: bishop },
-  { color: "BLACK", location: new Vector(3, 7), type: king },
-  { color: "BLACK", location: new Vector(4, 7), type: queen },
-  { color: "BLACK", location: new Vector(5, 7), type: bishop },
-  { color: "BLACK", location: new Vector(6, 7), type: knight },
-  { color: "BLACK", location: new Vector(7, 7), type: rook },
-
-  { color: "BLACK", location: new Vector(0, 6), type: pawn },
-  { color: "BLACK", location: new Vector(1, 6), type: pawn },
-  { color: "BLACK", location: new Vector(2, 6), type: pawn },
-  { color: "BLACK", location: new Vector(3, 6), type: pawn },
-  { color: "BLACK", location: new Vector(4, 6), type: pawn },
-  { color: "BLACK", location: new Vector(5, 6), type: pawn },
-  { color: "BLACK", location: new Vector(6, 6), type: pawn },
-  { color: "BLACK", location: new Vector(7, 6), type: pawn },
-]
 
 let board = {
-  pieces: pieces
+  pieces: [
+    { color: "WHITE", location: new Vector(0, 0), type: rook },
+    { color: "WHITE", location: new Vector(1, 0), type: knight },
+    { color: "WHITE", location: new Vector(2, 0), type: bishop },
+    { color: "WHITE", location: new Vector(3, 0), type: king },
+    { color: "WHITE", location: new Vector(4, 0), type: queen },
+    { color: "WHITE", location: new Vector(5, 0), type: bishop },
+    { color: "WHITE", location: new Vector(6, 0), type: knight },
+    { color: "WHITE", location: new Vector(7, 0), type: rook },
+  
+    { color: "WHITE", location: new Vector(0, 1), type: pawn },
+    { color: "WHITE", location: new Vector(1, 1), type: pawn },
+    { color: "WHITE", location: new Vector(2, 1), type: pawn },
+    { color: "WHITE", location: new Vector(3, 1), type: pawn },
+    { color: "WHITE", location: new Vector(4, 1), type: pawn },
+    { color: "WHITE", location: new Vector(5, 1), type: pawn },
+    { color: "WHITE", location: new Vector(6, 1), type: pawn },
+    { color: "WHITE", location: new Vector(7, 1), type: pawn },
+  
+    { color: "BLACK", location: new Vector(0, 7), type: rook },
+    { color: "BLACK", location: new Vector(1, 7), type: knight },
+    { color: "BLACK", location: new Vector(2, 7), type: bishop },
+    { color: "BLACK", location: new Vector(3, 7), type: king },
+    { color: "BLACK", location: new Vector(4, 7), type: queen },
+    { color: "BLACK", location: new Vector(5, 7), type: bishop },
+    { color: "BLACK", location: new Vector(6, 7), type: knight },
+    { color: "BLACK", location: new Vector(7, 7), type: rook },
+  
+    { color: "BLACK", location: new Vector(0, 6), type: pawn },
+    { color: "BLACK", location: new Vector(1, 6), type: pawn },
+    { color: "BLACK", location: new Vector(2, 6), type: pawn },
+    { color: "BLACK", location: new Vector(3, 6), type: pawn },
+    { color: "BLACK", location: new Vector(4, 6), type: pawn },
+    { color: "BLACK", location: new Vector(5, 6), type: pawn },
+    { color: "BLACK", location: new Vector(6, 6), type: pawn },
+    { color: "BLACK", location: new Vector(7, 6), type: pawn },
+  ] as Piece[]
 }
 
 let offsetX = 0
@@ -100,11 +99,11 @@ function tileAt(x: number, y: number) {
 
 function pieceAt(x: number, y: number): Piece | undefined {
   let tile = tileAt(x, y)
-  return pieces.find((p) => p.location.x === tile.x && p.location.y === tile.y)
+  return board.pieces.find((p) => p.location.x === tile.x && p.location.y === tile.y)
 }
 
 function pieceAtTile(tile: Vector): Piece | undefined {
-  return pieces.find((p) => p.location.x === tile.x && p.location.y === tile.y)
+  return board.pieces.find((p) => p.location.x === tile.x && p.location.y === tile.y)
 }
 
 const tileSize = 100
@@ -142,24 +141,35 @@ function draw() {
           matchScale(tileSize)
         )
       }
-      if (pickedUp && pickedUpLegalMove(new Vector(x, y))) {
-        ctx.fillStyle = "rgba(255, 255, 255, 0.5)"
-        ctx.beginPath()
-        ctx.ellipse(
-          transformX(x * tileSize + tileSize / 2),
-          transformY(y * tileSize + tileSize / 2),
-          matchScale(20),
-          matchScale(20),
-          0,
-          0,
-          Math.PI * 2
-        )
-        ctx.fill()
+      if (pickedUp) {
+        const tile = new Vector(x, y)
+        if (pickedUpLegalMove(tile)) {
+          ctx.fillStyle = "rgba(255, 255, 255, 0.5)"
+          ctx.beginPath()
+          ctx.ellipse(
+            transformX(x * tileSize + tileSize / 2),
+            transformY(y * tileSize + tileSize / 2),
+            matchScale(20),
+            matchScale(20),
+            0,
+            0,
+            Math.PI * 2
+          )
+          ctx.fill()
+        } else if (pickedUpLegalTake(tile)) {
+          ctx.fillStyle = "rgba(255, 255, 255, 0.5)"
+          ctx.fillRect(
+            transformX(x * tileSize),
+            transformY(y * tileSize),
+            matchScale(tileSize),
+            matchScale(tileSize),
+          )
+        }
       }
     }
   }
 
-  for (let piece of pieces) {
+  for (let piece of board.pieces) {
     if (!(pickedUp && piece == pickedUp))
       ctx.drawImage(
         piece.color === "WHITE" ? piece.type.whiteImage : piece.type.blackImage,
@@ -236,6 +246,24 @@ function matchingVector(list: Array<Vector>, v: Vector) {
 function pickedUpLegalMove(tile: Vector) {
   if (!pickedUp) return false
   let otherPiece = pieceAtTile(tile)
+  if (!otherPiece)
+    return matchingVector(pickedUpMoves, tile)  
+  else return false
+}
+
+function pickedUpLegalTake(tile: Vector) {
+  if (!pickedUp) return false
+  let otherPiece = pieceAtTile(tile)
+  if (otherPiece)
+    return matchingVector(pickedUpTakes, tile)  
+    && !(pickedUp === otherPiece) // it's not the same piece
+    && !(pickedUp.color === otherPiece.color) // it's not the same color
+  else return false
+}
+
+function pickedUpLegalAction(tile: Vector) {
+  if (!pickedUp) return false
+  let otherPiece = pieceAtTile(tile)
   return otherPiece ? (matchingVector(pickedUpTakes, tile) && !(pickedUp === otherPiece) &&
   !(pickedUp.color === otherPiece.color)) : matchingVector(pickedUpMoves, tile)
 }
@@ -245,8 +273,7 @@ function pickedUpLegalMove(tile: Vector) {
  * 
  * 
  */
-function legalMove(piece: Piece, tile: Vector) {
-  // return false
+function legalAction(piece: Piece, tile: Vector) {
   let otherPiece = pieceAtTile(tile)
   return otherPiece
     ? piece.type.takes(piece, board, bounds).find(other => other.x === tile.x && other.y === tile.y) &&
@@ -258,11 +285,11 @@ function legalMove(piece: Piece, tile: Vector) {
 /**
  * Move a certain piece to a tile, capturing if necessary.
  * For performance reasons, this method does not check move
- * validity; use `legalMove` to do that.
+ * validity; use `legalAction` to do that.
  */
 function movePiece(piece: Piece, tile: Vector) {
   let otherPiece = pieceAtTile(tile)
-  if (otherPiece) pieces = pieces.filter((o) => o !== otherPiece)
+  if (otherPiece) board.pieces = board.pieces.filter((o) => o !== otherPiece)
   piece.location.x = tile.x
   piece.location.y = tile.y
 }
@@ -271,7 +298,7 @@ document.addEventListener("mouseup", () => {
   movingBoard = false
   if (pickedUp) {
     let tile = tileAt(mousePos.x, mousePos.y)
-    if (pickedUpLegalMove(tile)) movePiece(pickedUp, tile)
+    if (pickedUpLegalAction(tile)) movePiece(pickedUp, tile)
     pickedUp = undefined
   }
 })

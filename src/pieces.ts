@@ -63,7 +63,9 @@ function createImage(src: string) {
 export let king = new (class extends PieceType {
   whiteImage = createImage("wk")
   blackImage = createImage("bk")
-  override moves = step(new Vector(1, 1), 1, false)
+  override moves = combine(
+    step(new Vector(1, 0), 1, true ), 
+    step(new Vector(1, 1), 1, false)) // this is kind bad
 })()
 
 export let bishop = new (class extends PieceType {
@@ -85,6 +87,10 @@ export let pawn = new (class extends PieceType {
     piece.color === 'WHITE' 
       ? [piece.location.plus(new Vector(0,  1)), piece.location.plus(new Vector(0,  2))]
       : [piece.location.plus(new Vector(0, -1)), piece.location.plus(new Vector(0, -2))]
+  override takes = (piece: Piece) => 
+    piece.color === 'WHITE' 
+      ? [piece.location.plus(new Vector(1,  1)), piece.location.plus(new Vector(-1,  1))]
+      : [piece.location.plus(new Vector(1, -1)), piece.location.plus(new Vector(-1, -1))]
 })()
 
 export let knight = new (class extends PieceType {
@@ -112,6 +118,11 @@ function inBounds(bounds: Bounds, v: Vector) {
          bounds.minY <= v.y && v.y <= bounds.maxY
 }
 
+// TODO: Make board into a class with a `pieceAt` method.
+function pieceAt(tile: Vector, board: Board) {
+  return board.pieces.find(it => it.location.x === tile.x && it.location.y === tile.y)
+}
+
 /**
  * Create
  * 
@@ -121,14 +132,16 @@ function inBounds(bounds: Bounds, v: Vector) {
  */
 
 function step(d: Vector, maxN: number = Infinity, symmetric: boolean = false): Moves {
-  return (piece: Piece, _board: Board, bounds: Bounds) => {
+  return (piece: Piece, board: Board, bounds: Bounds) => {
     let moves: Vector[] = []
     function stepInOneDirection(sx: number, sy: number) {
       let n = 0;
       let newLocation = piece.location.plus(new Vector(d.x * sx, d.y * sy))
-      // console.log(bounds, newLocation)
       while (n < maxN && inBounds(bounds, newLocation)) {
+        let otherPiece = pieceAt(newLocation, board)
+        if (otherPiece && otherPiece.color === piece.color) break
         moves.push(newLocation)
+        if (otherPiece && otherPiece.color !== piece.color) break
         newLocation = newLocation.plus(new Vector(d.x * sx, d.y * sy))
         n++
       }
