@@ -440,9 +440,6 @@ var cancel
 var preview
 
 function draw() {
-  if (window.innerWidth != width || window.innerWidth != height) {
-    resizeCanvas(window.innerWidth, window.innerHeight, false)
-  }
   background(240, 217, 181)
   shownScale += (realScale - shownScale) * 0.3
   shownBoardOffset.x += (realBoardOffset.x - shownBoardOffset.x) * 0.3
