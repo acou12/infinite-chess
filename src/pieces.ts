@@ -37,10 +37,10 @@ export abstract class PieceType {
    * @param piece The piece being moved.
    * @returns A list of legal moves for the piece
    */
-   abstract moves(piece: Piece, board: Board, bounds: Bounds): Vector[]
-   takes(piece: Piece, board: Board, bounds: Bounds): Vector[] {
-     return this.moves(piece, board, bounds)
-   }
+  abstract moves(piece: Piece, board: Board, bounds: Bounds): Vector[]
+  takes(piece: Piece, board: Board, bounds: Bounds): Vector[] {
+    return this.moves(piece, board, bounds)
+  }
 }
 
 export interface Piece {
@@ -64,8 +64,9 @@ export let king = new (class extends PieceType {
   whiteImage = createImage("wk")
   blackImage = createImage("bk")
   override moves = combine(
-    step(new Vector(1, 0), 1, true ), 
-    step(new Vector(1, 1), 1, false)) // this is kind bad
+    step(new Vector(1, 0), 1, true),
+    step(new Vector(1, 1), 1, false)
+  ) // this is kind bad
 })()
 
 export let bishop = new (class extends PieceType {
@@ -83,14 +84,26 @@ export let rook = new (class extends PieceType {
 export let pawn = new (class extends PieceType {
   whiteImage = createImage("wp")
   blackImage = createImage("bp")
-  override moves = (piece: Piece) => 
-    piece.color === 'WHITE' 
-      ? [piece.location.plus(new Vector(0,  1)), piece.location.plus(new Vector(0,  2))]
-      : [piece.location.plus(new Vector(0, -1)), piece.location.plus(new Vector(0, -2))]
-  override takes = (piece: Piece) => 
-    piece.color === 'WHITE' 
-      ? [piece.location.plus(new Vector(1,  1)), piece.location.plus(new Vector(-1,  1))]
-      : [piece.location.plus(new Vector(1, -1)), piece.location.plus(new Vector(-1, -1))]
+  override moves = (piece: Piece) =>
+    piece.color === "WHITE"
+      ? [
+          piece.location.plus(new Vector(0, 1)),
+          piece.location.plus(new Vector(0, 2)),
+        ]
+      : [
+          piece.location.plus(new Vector(0, -1)),
+          piece.location.plus(new Vector(0, -2)),
+        ]
+  override takes = (piece: Piece) =>
+    piece.color === "WHITE"
+      ? [
+          piece.location.plus(new Vector(1, 1)),
+          piece.location.plus(new Vector(-1, 1)),
+        ]
+      : [
+          piece.location.plus(new Vector(1, -1)),
+          piece.location.plus(new Vector(-1, -1)),
+        ]
 })()
 
 export let knight = new (class extends PieceType {
@@ -114,28 +127,38 @@ export let queen = new (class extends PieceType {
 })()
 
 function inBounds(bounds: Bounds, v: Vector) {
-  return bounds.minX <= v.x && v.x <= bounds.maxX &&
-         bounds.minY <= v.y && v.y <= bounds.maxY
+  return (
+    bounds.minX <= v.x &&
+    v.x <= bounds.maxX &&
+    bounds.minY <= v.y &&
+    v.y <= bounds.maxY
+  )
 }
 
 // TODO: Make board into a class with a `pieceAt` method.
 function pieceAt(tile: Vector, board: Board) {
-  return board.pieces.find(it => it.location.x === tile.x && it.location.y === tile.y)
+  return board.pieces.find(
+    (it) => it.location.x === tile.x && it.location.y === tile.y
+  )
 }
 
 /**
  * Create
- * 
+ *
  * @param d The absolute change in position per "step".
  * @param maxN The maximum number of steps; by default, there
- *          is no maximum. 
+ *          is no maximum.
  */
 
-function step(d: Vector, maxN: number = Infinity, symmetric: boolean = false): Moves {
+function step(
+  d: Vector,
+  maxN: number = Infinity,
+  symmetric: boolean = false
+): Moves {
   return (piece: Piece, board: Board, bounds: Bounds) => {
     let moves: Vector[] = []
     function stepInOneDirection(sx: number, sy: number) {
-      let n = 0;
+      let n = 0
       let newLocation = piece.location.plus(new Vector(d.x * sx, d.y * sy))
       while (n < maxN && inBounds(bounds, newLocation)) {
         let otherPiece = pieceAt(newLocation, board)

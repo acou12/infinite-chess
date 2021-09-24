@@ -25,7 +25,6 @@ img.src = "/images/wk.png"
  * that for both the AI logic and the actual UI logic.
  */
 
-
 let board = {
   pieces: [
     { color: "WHITE", location: new Vector(0, 0), type: rook },
@@ -36,7 +35,7 @@ let board = {
     { color: "WHITE", location: new Vector(5, 0), type: bishop },
     { color: "WHITE", location: new Vector(6, 0), type: knight },
     { color: "WHITE", location: new Vector(7, 0), type: rook },
-  
+
     { color: "WHITE", location: new Vector(0, 1), type: pawn },
     { color: "WHITE", location: new Vector(1, 1), type: pawn },
     { color: "WHITE", location: new Vector(2, 1), type: pawn },
@@ -45,7 +44,7 @@ let board = {
     { color: "WHITE", location: new Vector(5, 1), type: pawn },
     { color: "WHITE", location: new Vector(6, 1), type: pawn },
     { color: "WHITE", location: new Vector(7, 1), type: pawn },
-  
+
     { color: "BLACK", location: new Vector(0, 7), type: rook },
     { color: "BLACK", location: new Vector(1, 7), type: knight },
     { color: "BLACK", location: new Vector(2, 7), type: bishop },
@@ -54,7 +53,7 @@ let board = {
     { color: "BLACK", location: new Vector(5, 7), type: bishop },
     { color: "BLACK", location: new Vector(6, 7), type: knight },
     { color: "BLACK", location: new Vector(7, 7), type: rook },
-  
+
     { color: "BLACK", location: new Vector(0, 6), type: pawn },
     { color: "BLACK", location: new Vector(1, 6), type: pawn },
     { color: "BLACK", location: new Vector(2, 6), type: pawn },
@@ -63,7 +62,7 @@ let board = {
     { color: "BLACK", location: new Vector(5, 6), type: pawn },
     { color: "BLACK", location: new Vector(6, 6), type: pawn },
     { color: "BLACK", location: new Vector(7, 6), type: pawn },
-  ] as Piece[]
+  ] as Piece[],
 }
 
 let offsetX = 0
@@ -99,11 +98,15 @@ function tileAt(x: number, y: number) {
 
 function pieceAt(x: number, y: number): Piece | undefined {
   let tile = tileAt(x, y)
-  return board.pieces.find((p) => p.location.x === tile.x && p.location.y === tile.y)
+  return board.pieces.find(
+    (p) => p.location.x === tile.x && p.location.y === tile.y
+  )
 }
 
 function pieceAtTile(tile: Vector): Piece | undefined {
-  return board.pieces.find((p) => p.location.x === tile.x && p.location.y === tile.y)
+  return board.pieces.find(
+    (p) => p.location.x === tile.x && p.location.y === tile.y
+  )
 }
 
 const tileSize = 100
@@ -112,7 +115,7 @@ let bounds: Bounds = {
   minX: 0,
   maxX: 100,
   minY: 0,
-  maxY: 100
+  maxY: 100,
 }
 
 function draw() {
@@ -162,7 +165,7 @@ function draw() {
             transformX(x * tileSize),
             transformY(y * tileSize),
             matchScale(tileSize),
-            matchScale(tileSize),
+            matchScale(tileSize)
           )
         }
       }
@@ -236,18 +239,16 @@ document.addEventListener("mousedown", () => {
   } else {
     movingBoard = true
   }
-
 })
 
 function matchingVector(list: Array<Vector>, v: Vector) {
-  return list.find(it => it.x === v.x && it.y === v.y)
+  return list.find((it) => it.x === v.x && it.y === v.y)
 }
 
 function pickedUpLegalMove(tile: Vector) {
   if (!pickedUp) return false
   let otherPiece = pieceAtTile(tile)
-  if (!otherPiece)
-    return matchingVector(pickedUpMoves, tile)  
+  if (!otherPiece) return matchingVector(pickedUpMoves, tile)
   else return false
 }
 
@@ -255,31 +256,41 @@ function pickedUpLegalTake(tile: Vector) {
   if (!pickedUp) return false
   let otherPiece = pieceAtTile(tile)
   if (otherPiece)
-    return matchingVector(pickedUpTakes, tile)  
-    && !(pickedUp === otherPiece) // it's not the same piece
-    && !(pickedUp.color === otherPiece.color) // it's not the same color
+    return (
+      matchingVector(pickedUpTakes, tile) &&
+      !(pickedUp === otherPiece) && // it's not the same piece
+      !(pickedUp.color === otherPiece.color)
+    )
+  // it's not the same color
   else return false
 }
 
 function pickedUpLegalAction(tile: Vector) {
   if (!pickedUp) return false
   let otherPiece = pieceAtTile(tile)
-  return otherPiece ? (matchingVector(pickedUpTakes, tile) && !(pickedUp === otherPiece) &&
-  !(pickedUp.color === otherPiece.color)) : matchingVector(pickedUpMoves, tile)
+  return otherPiece
+    ? matchingVector(pickedUpTakes, tile) &&
+        !(pickedUp === otherPiece) &&
+        !(pickedUp.color === otherPiece.color)
+    : matchingVector(pickedUpMoves, tile)
 }
 
 /**
  * @returns Whether it is legal for `piece` to move to `tile`.
- * 
- * 
+ *
+ *
  */
 function legalAction(piece: Piece, tile: Vector) {
   let otherPiece = pieceAtTile(tile)
   return otherPiece
-    ? piece.type.takes(piece, board, bounds).find(other => other.x === tile.x && other.y === tile.y) &&
+    ? piece.type
+        .takes(piece, board, bounds)
+        .find((other) => other.x === tile.x && other.y === tile.y) &&
         !(piece === otherPiece) &&
         !(piece.color === otherPiece.color)
-    : piece.type.moves(piece, board, bounds).find(other => other.x === tile.x && other.y === tile.y)
+    : piece.type
+        .moves(piece, board, bounds)
+        .find((other) => other.x === tile.x && other.y === tile.y)
 }
 
 /**
